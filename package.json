@@ -1,11 +1,18 @@
 {
-  "name": "hono",
+  "name": "profile-intelligence-service",
   "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc"
+  },
   "dependencies": {
-    "hono": "^4.12.14"
+    "@vercel/postgres": "^0.10.0",
+    "hono": "^4.12.14",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
+    "@types/uuid": "^10.0.0",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   }
