@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { serve } from '@hono/node-server';
 import { createTable, getProfileByName, getProfileById, getProfiles, createProfile, deleteProfileById } from './db';
-import { enrichAndProcessProfile, ProfileData } from './profileService';
+import { enrichAndProcessProfile } from './profileService';
 
 type Env = {
   Bindings: {
@@ -10,6 +12,8 @@ type Env = {
 };
 
 const app = new Hono<Env>();
+
+console.log('Server starting on http://localhost:3000');
 
 app.get('/', (c) => {
   return c.json({ 
@@ -105,7 +109,7 @@ app.get('/api/profiles', async (c) => {
       age_group: age_group || undefined,
     });
 
-    const simplifiedProfiles = profiles.map((p) => ({
+    const simplifiedProfiles = profiles.map((p: any) => ({
       id: p.id,
       name: p.name,
       gender: p.gender,
@@ -169,6 +173,11 @@ app.delete('/api/profiles/:id', async (c) => {
     console.error('Error deleting profile:', error);
     return c.json({ status: 'error', message: 'Internal Server Error' }, 500);
   }
+});
+
+serve({
+  fetch: app.fetch,
+  port: 3000,
 });
 
 export default app;

@@ -2,10 +2,12 @@
   "name": "profile-intelligence-service",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/index.ts"
+    "dev": "tsx --watch src/index.ts"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.14",
     "@vercel/postgres": "^0.10.0",
+    "dotenv": "^17.4.2",
     "hono": "^4.12.14",
     "uuid": "^11.1.0"
   },

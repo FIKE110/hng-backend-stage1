@@ -18,19 +18,17 @@ export async function createTable() {
         country_id VARCHAR(10),
         country_probability DECIMAL(5,2),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-      );
+      )
     `;
     
-    await sql`
-      CREATE INDEX IF NOT EXISTS idx_profiles_name ON profiles(name);
-      CREATE INDEX IF NOT EXISTS idx_profiles_gender ON profiles(gender);
-      CREATE INDEX IF NOT EXISTS idx_profiles_country_id ON profiles(country_id);
-      CREATE INDEX IF NOT EXISTS idx_profiles_age_group ON profiles(age_group);
-    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_profiles_name ON profiles(name)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_profiles_gender ON profiles(gender)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_profiles_country_id ON profiles(country_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_profiles_age_group ON profiles(age_group)`;
     
     tableCreated = true;
   } catch (e) {
-    console.error('Failed to create table:', e);
+    // Silent fail - table might already exist or DB not available yet
   }
 }
 
