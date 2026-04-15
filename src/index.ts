@@ -11,15 +11,19 @@ type Env = {
 
 const app = new Hono<Env>();
 
-console.log('===========================================');
-console.log('Profile Intelligence Service');
-console.log('Server starting on port 3000...');
-console.log('Database URL:', process.env.POSTGRES_URL ? '✓ Set' : '✗ Not set');
-console.log('===========================================');
+app.get('/', (c) => {
+  return c.json({ 
+    status: 'success', 
+    message: 'Profile Intelligence Service is running',
+    endpoints: ['POST /api/profiles', 'GET /api/profiles', 'GET /api/profiles/:id', 'DELETE /api/profiles/:id']
+  });
+});
 
 app.use('*', cors({
   origin: '*',
 }));
+
+createTable();
 
 app.notFound((c) => {
   return c.json({ status: 'error', message: 'Not Found' }, 404);

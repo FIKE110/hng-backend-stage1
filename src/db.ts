@@ -1,27 +1,37 @@
 import { sql } from '@vercel/postgres';
 
+let tableCreated = false;
+
 export async function createTable() {
-  await sql`
-    CREATE TABLE IF NOT EXISTS profiles (
-      id UUID PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      gender VARCHAR(50),
-      gender_probability DECIMAL(5,2),
-      sample_size INTEGER,
-      age INTEGER,
-      age_group VARCHAR(50),
-      country_id VARCHAR(10),
-      country_probability DECIMAL(5,2),
-      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-    );
-  `;
+  if (tableCreated) return;
   
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_profiles_name ON profiles(name);
-    CREATE INDEX IF NOT EXISTS idx_profiles_gender ON profiles(gender);
-    CREATE INDEX IF NOT EXISTS idx_profiles_country_id ON profiles(country_id);
-    CREATE INDEX IF NOT EXISTS idx_profiles_age_group ON profiles(age_group);
-  `;
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS profiles (
+        id UUID PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        gender VARCHAR(50),
+        gender_probability DECIMAL(5,2),
+        sample_size INTEGER,
+        age INTEGER,
+        age_group VARCHAR(50),
+        country_id VARCHAR(10),
+        country_probability DECIMAL(5,2),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      );
+    `;
+    
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_profiles_name ON profiles(name);
+      CREATE INDEX IF NOT EXISTS idx_profiles_gender ON profiles(gender);
+      CREATE INDEX IF NOT EXISTS idx_profiles_country_id ON profiles(country_id);
+      CREATE INDEX IF NOT EXISTS idx_profiles_age_group ON profiles(age_group);
+    `;
+    
+    tableCreated = true;
+  } catch (e) {
+    console.error('Failed to create table:', e);
+  }
 }
 
 export async function getProfileByName(name: string) {

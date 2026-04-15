@@ -1,6 +1,9 @@
 {
   "name": "profile-intelligence-service",
   "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts"
+  },
   "dependencies": {
     "@vercel/postgres": "^0.10.0",
     "hono": "^4.12.14",
