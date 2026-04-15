@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { serve } from '@hono/node-server';
 import { createTable, getProfileByName, getProfileById, getProfiles, createProfile, deleteProfileById } from './db';
 import { enrichAndProcessProfile } from './profileService';
 
@@ -173,11 +172,6 @@ app.delete('/api/profiles/:id', async (c) => {
     console.error('Error deleting profile:', error);
     return c.json({ status: 'error', message: 'Internal Server Error' }, 500);
   }
-});
-
-serve({
-  fetch: app.fetch,
-  port: 3000,
 });
 
 export default app;
