@@ -1,0 +1,84 @@
+import { sql } from '@vercel/postgres';
+let tableCreated = false;
+export async function createTable() {
+    if (tableCreated)
+        return;
+    try {
+        await sql `
+      CREATE TABLE IF NOT EXISTS profiles (
+        id UUID PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        gender VARCHAR(50),
+        gender_probability DECIMAL(5,2),
+        sample_size INTEGER,
+        age INTEGER,
+        age_group VARCHAR(50),
+        country_id VARCHAR(10),
+        country_probability DECIMAL(5,2),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `;
+        await sql `CREATE INDEX IF NOT EXISTS idx_profiles_name ON profiles(name)`;
+        await sql `CREATE INDEX IF NOT EXISTS idx_profiles_gender ON profiles(gender)`;
+        await sql `CREATE INDEX IF NOT EXISTS idx_profiles_country_id ON profiles(country_id)`;
+        await sql `CREATE INDEX IF NOT EXISTS idx_profiles_age_group ON profiles(age_group)`;
+        tableCreated = true;
+    }
+    catch (e) {
+        // Silent fail - table might already exist or DB not available yet
+    }
+}
+export async function getProfileByName(name) {
+    const { rows } = await sql `
+    SELECT * FROM profiles WHERE name = ${name} LIMIT 1;
+  `;
+    return rows[0] || null;
+}
+export async function getProfileById(id) {
+    const { rows } = await sql `
+    SELECT * FROM profiles WHERE id = ${id} LIMIT 1;
+  `;
+    return rows[0] || null;
+}
+export async function getProfiles(filters) {
+    let query = 'SELECT * FROM profiles WHERE 1=1';
+    const params = [];
+    let paramIndex = 1;
+    if (filters.gender) {
+        query += ` AND LOWER(gender) = LOWER($${paramIndex})`;
+        params.push(filters.gender);
+        paramIndex++;
+    }
+    if (filters.country_id) {
+        query += ` AND LOWER(country_id) = LOWER($${paramIndex})`;
+        params.push(filters.country_id);
+        paramIndex++;
+    }
+    if (filters.age_group) {
+        query += ` AND LOWER(age_group) = LOWER($${paramIndex})`;
+        params.push(filters.age_group);
+        paramIndex++;
+    }
+    const { rows } = await sql.query(query, params);
+    return rows;
+}
+export async function createProfile(profile) {
+    const { rows } = await sql `
+    INSERT INTO profiles (
+      id, name, gender, gender_probability, sample_size, 
+      age, age_group, country_id, country_probability, created_at
+    ) VALUES (
+      ${profile.id}, ${profile.name}, ${profile.gender}, ${profile.gender_probability},
+      ${profile.sample_size}, ${profile.age}, ${profile.age_group}, ${profile.country_id},
+      ${profile.country_probability}, ${profile.created_at}
+    )
+    RETURNING *;
+  `;
+    return rows[0];
+}
+export async function deleteProfileById(id) {
+    const { rows } = await sql `
+    DELETE FROM profiles WHERE id = ${id} RETURNING *;
+  `;
+    return rows[0] || null;
+}

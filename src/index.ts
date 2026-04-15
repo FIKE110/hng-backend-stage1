@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { createTable, getProfileByName, getProfileById, getProfiles, createProfile, deleteProfileById } from './db';
-import { enrichAndProcessProfile } from './profileService';
+import { createTable, getProfileByName, getProfileById, getProfiles, createProfile, deleteProfileById } from './db.js';
+import { enrichAndProcessProfile } from './profileService.js';
 
 type Env = {
   Bindings: {
